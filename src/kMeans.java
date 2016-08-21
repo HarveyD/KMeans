@@ -136,6 +136,22 @@ public class kMeans {
 		HashMap<String, Integer> globalDictionary = new HashMap<String, Integer>();
 		
 		
+		ArrayList<String> stopwords = new ArrayList<String>();
+		
+		try{
+			BufferedReader reader = new BufferedReader(new FileReader("src/stopwords.txt"));
+			String nextLine;
+			while((nextLine = reader.readLine())!= null){
+				stopwords.add(nextLine);
+			}
+			
+			reader.close();
+		
+		} catch (IOException e) {
+			System.out.println("error in reading from file");
+		}
+		
+		
 		
 		int documentNumber =0;
 		
@@ -156,29 +172,30 @@ public class kMeans {
 					String[] words = nextLine.split(" ");
 
 					for(String w: words){
-						int index;
-						docSize++;
-					
-						//Add stopword removal, lowercasing etc.
-						w=w.toLowerCase().replaceAll("[^\\p{Alpha}]", "");
+						if(!stopwords.contains(w)){
+							
+							int index;
+							docSize++;
 						
-						//Add to global dictionary
-						if(globalDictionary.containsKey(w)){
-							index = globalDictionary.get(w);	
-						}else{
-							index = globalDictionary.size();
-							globalDictionary.put(w, index);	
-						}
+							//Add stopword removal, lowercasing etc.
+							w=w.toLowerCase().replaceAll("[^\\p{Alpha}]", "");
+							
+							//Add to global dictionary
+							if(globalDictionary.containsKey(w)){
+								index = globalDictionary.get(w);	
+							}else{
+								index = globalDictionary.size();
+								globalDictionary.put(w, index);	
+							}
+							
+							if(localDictionary.containsKey(w)){
+								double increment = localDictionary.get(w) +1.0;
+								localDictionary.put(w, increment);
+							}else{
+								localDictionary.put(w, 1.0);
+							}
 						
-						if(localDictionary.containsKey(w)){
-							double increment = localDictionary.get(w) +1.0;
-							localDictionary.put(w, increment);
-						}else{
-							localDictionary.put(w, 1.0);
-						}
-						
-						//Random score between 0 and 1 for now.
-						//d.addWord(index, 0);
+						};
 					}				
 				}
 				
